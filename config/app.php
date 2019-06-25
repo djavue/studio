@@ -41,7 +41,7 @@ return [
     |
     */
 
-    'url' => 'http://rosie-studio.net/',
+    'url' => 'http://www.djavue.net/',
 
     /*
     |--------------------------------------------------------------------------
@@ -101,7 +101,7 @@ return [
     |
     */
 
-    'key' => 'gaIcPlsZMF7mGNuCUsQ5dPYw7jI8N3Pi',
+    'key' => '6cpxiF2IqFE6rN1f0rs1ip6iP2st27pn',
 
     'cipher' => 'AES-256-CBC',
 

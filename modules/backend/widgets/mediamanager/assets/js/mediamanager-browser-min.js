@@ -367,6 +367,21 @@ for(var i=0,len=items.length;i<len;i++){var item=items[i],path=item.getAttribute
 if(item.getAttribute('data-item-type')=='folder')
 data.exclude.push(path)}
 $(ev.target).popup({handler:this.options.alias+'::onLoadMovePopup',extraData:data,zIndex:1200})}
+MediaManager.prototype.extractItem=function(ev){var items=this.$el.get(0).querySelectorAll('[data-type="media-item"].selected')
+if(!items.length){$.oc.alert(this.options.extractEmpty)
+return}
+$.oc.confirm(this.options.extractConfirm, this.proxy(this.extractConfirmation))}
+MediaManager.prototype.extractConfirmation=function(confirmed){if(!confirmed)
+return
+var items=this.$el.get(0).querySelectorAll('[data-type="media-item"].selected'),paths=[]
+for(var i=0,len=items.length;i<len;i++){if(items[i].hasAttribute('data-root')){continue;}
+paths.push({'path':items[i].getAttribute('data-path'),'type':items[i].getAttribute('data-item-type')})}
+var data={paths:paths}
+$.oc.stripeLoadIndicator.show()
+
+// this.$form.request(this.options.alias+'::onDeleteItem',{data:data}).always(function(){$.oc.stripeLoadIndicator.hide()}).done(this.proxy(this.afterNavigate))
+
+}
 MediaManager.prototype.onMovePopupShown=function(ev,button,popup){$(popup).on('submit.media','form',this.proxy(this.onMoveItemsSubmit))}
 MediaManager.prototype.onMoveItemsSubmit=function(ev){var items=this.$el.get(0).querySelectorAll('[data-type="media-item"].selected'),data={dest:$(ev.target).find('select[name=dest]').val(),originalPath:$(ev.target).find('input[name=originalPath]').val(),files:[],folders:[]}
 for(var i=0,len=items.length;i<len;i++){var item=items[i],path=item.getAttribute('data-path')
@@ -394,6 +409,7 @@ break;case'set-filter':this.setFilter($(ev.currentTarget).data('filter'))
 break;case'delete':this.deleteItems()
 break;case'create-folder':this.createFolder(ev)
 break;case'move':this.moveItems(ev)
+break;case'extract':this.extractItem(ev)
 break;case'toggle-sidebar':this.toggleSidebar(ev)
 break;case'popup-command':var popupCommand=$(ev.currentTarget).data('popup-command')
 if(popupCommand!=='crop-and-insert')
@@ -465,7 +481,7 @@ eventHandled=true
 break;}
 if(eventHandled){ev.preventDefault()
 ev.stopPropagation()}}
-MediaManager.DEFAULTS={url:window.location,alias:'',uniqueId:null,deleteEmpty:'Please select files to delete.',deleteConfirm:'Delete the selected file(s)?',moveEmpty:'Please select files to move.',selectSingleImage:'Please select a single image.',selectionNotImage:'The selected item is not an image.',bottomToolbar:false,cropAndInsertButton:false}
+MediaManager.DEFAULTS={url:window.location,alias:'',uniqueId:null,deleteEmpty:'Please select files to delete.',deleteConfirm:'Delete the selected file(s)?',extractEmpty: 'Please select files to extract.',extractConfirm: 'Extract the selected file?',moveEmpty:'Please select files to move.',selectSingleImage:'Please select a single image.',selectionNotImage:'The selected item is not an image.',bottomToolbar:false,cropAndInsertButton:false}
 var old=$.fn.mediaManager
 $.fn.mediaManager=function(option){var args=Array.prototype.slice.call(arguments,1),result=undefined
 this.each(function(){var $this=$(this)

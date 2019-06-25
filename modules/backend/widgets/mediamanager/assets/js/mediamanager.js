@@ -941,6 +941,36 @@
         }).done(this.proxy(this.afterNavigate))
     }
 
+    MediaManager.prototype.extractConfirmation = function(confirmed) {
+        if (!confirmed)
+            return
+
+        var items = this.$el.get(0).querySelectorAll('[data-type="media-item"].selected'),
+            paths = []
+
+        for (var i=0, len=items.length; i<len; i++) {
+            // Skip the 'return to parent' item
+            if (items[i].hasAttribute('data-root')) {
+                continue;
+            }
+            paths.push({
+                'path': items[i].getAttribute('data-path'),
+                'type': items[i].getAttribute('data-item-type')
+            })
+        }
+
+        var data = {
+                paths: paths
+            }
+
+        $.oc.stripeLoadIndicator.show()
+        // this.$form.request(this.options.alias+'::onDeleteItem', {
+            // data: data
+        // }).always(function() {
+            // $.oc.stripeLoadIndicator.hide()
+        // }).done(this.proxy(this.afterNavigate))
+    }
+    
     MediaManager.prototype.createFolder = function(ev) {
         $(ev.target).popup({
             content: this.$el.find('[data-control="new-folder-template"]').html(),
@@ -1008,34 +1038,17 @@
         })
     }
 
-	MediaManager.prototype.extractFile = function(ev) {
+    MediaManager.prototype.extractItem = function(ev) {
         var items = this.$el.get(0).querySelectorAll('[data-type="media-item"].selected')
-debugger;
+
         if (!items.length) {
-            $.oc.alert(this.options.moveEmpty)
+            $.oc.alert(this.options.extractEmpty)
             return
         }
 
-        var data = {
-            exclude: [],
-            path: this.$el.find('[data-type="current-folder"]').val()
-        }
-
-        for (var i = 0, len = items.length; i < len; i++) {
-            var item = items[i],
-                path = item.getAttribute('data-path')
-
-            if (item.getAttribute('data-item-type') == 'folder')
-                data.exclude.push(path)
-        }
-
-        $(ev.target).popup({
-            handler: this.options.alias+'::onLoadMovePopup',
-            extraData: data,
-            zIndex: 1200 // Media Manager can be opened in a popup, so this new popup should have a higher z-index
-        })
+        $.oc.confirm(this.options.extractConfirm, this.proxy(this.extractConfirmation))
     }
-	
+
     MediaManager.prototype.onMovePopupShown = function(ev, button, popup) {
         $(popup).on('submit.media', 'form', this.proxy(this.onMoveItemsSubmit))
     }
@@ -1120,8 +1133,8 @@ debugger;
             case 'move':
                 this.moveItems(ev)
             break;
-			case 'extract':
-                this.extractFile(ev)
+            case 'extract':
+                this.extractItem(ev)
             break;
             case 'toggle-sidebar':
                 this.toggleSidebar(ev)
@@ -1316,6 +1329,8 @@ debugger;
         uniqueId: null,
         deleteEmpty: 'Please select files to delete.',
         deleteConfirm: 'Delete the selected file(s)?',
+        extractEmpty: 'Please select files to extract.',
+        extractConfirm: 'Extract the selected file?',
         moveEmpty: 'Please select files to move.',
         selectSingleImage: 'Please select a single image.',
         selectionNotImage: 'The selected item is not an image.',
