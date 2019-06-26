@@ -964,11 +964,11 @@
             }
 
         $.oc.stripeLoadIndicator.show()
-        // this.$form.request(this.options.alias+'::onDeleteItem', {
-            // data: data
-        // }).always(function() {
-            // $.oc.stripeLoadIndicator.hide()
-        // }).done(this.proxy(this.afterNavigate))
+        this.$form.request(this.options.alias+'::onExtractItem', {
+            data: data
+        }).always(function() {
+            $.oc.stripeLoadIndicator.hide()
+        }).done(this.proxy(this.afterNavigate))
     }
     
     MediaManager.prototype.createFolder = function(ev) {

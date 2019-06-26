@@ -8,6 +8,7 @@ use Storage;
 use Request;
 use Url;
 use October\Rain\Filesystem\Definitions as FileDefinitions;
+use October\Rain\Filesystem\Zip as FileZip;
 use ApplicationException;
 use SystemException;
 
@@ -227,6 +228,19 @@ class MediaLibrary
         $fullPaths = $this->getMediaPath($path);
 
         return $this->getStorageDisk()->deleteDirectory($fullPaths);
+    }
+
+    /**
+     * Extract a file from the Library.
+     * @param string $path Specifies the file path relative to the Library root.
+     */
+    public function extractFile($path, $desc = './')
+    {
+        $path = self::validatePath($path);
+        $fullPaths = $this->getMediaPath($path);
+		
+		FileZip::extract($fullPaths, $desc);
+		return true;
     }
 
     /**

@@ -378,8 +378,7 @@ for(var i=0,len=items.length;i<len;i++){if(items[i].hasAttribute('data-root')){c
 paths.push({'path':items[i].getAttribute('data-path'),'type':items[i].getAttribute('data-item-type')})}
 var data={paths:paths}
 $.oc.stripeLoadIndicator.show()
-
-// this.$form.request(this.options.alias+'::onDeleteItem',{data:data}).always(function(){$.oc.stripeLoadIndicator.hide()}).done(this.proxy(this.afterNavigate))
+this.$form.request(this.options.alias+'::onExtractItem',{data:data}).always(function(){$.oc.stripeLoadIndicator.hide()}).done(this.proxy(this.afterNavigate))
 
 }
 MediaManager.prototype.onMovePopupShown=function(ev,button,popup){$(popup).on('submit.media','form',this.proxy(this.onMoveItemsSubmit))}

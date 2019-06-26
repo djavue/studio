@@ -373,6 +373,74 @@ class MediaManager extends WidgetBase
         ];
     }
 
+	/**
+     * Extract library item AJAX handler
+     * @return array
+     */
+    public function onExtractItem()
+    {
+        $this->abortIfReadOnly();
+
+        $paths = Input::get('paths');
+
+        if (!is_array($paths)) {
+            throw new ApplicationException('Invalid input data');
+        }
+
+        $library = MediaLibrary::instance();
+
+		$allowFileTypes = ['zip'];
+        $filesToExtract = [];
+        foreach ($paths as $pathInfo) {
+            $path = array_get($pathInfo, 'path');
+            $type = array_get($pathInfo, 'type');
+			
+			$storagePath = rtrim(Config::get('cms.storage.media.path', '/storage/app/media'), '/');
+			$info = pathinfo($storagePath . $path);
+			$ext = $info['extension'] ?? null;
+			
+            if (!$path || !$type || !in_array($ext, $allowFileTypes)) {
+                throw new ApplicationException('Invalid input data');
+            }
+
+            if ($type === MediaLibraryItem::TYPE_FILE) {
+                /*
+                 * Add to bulk collection
+                 */
+                $filesToExtract[] = $path;
+            }
+            elseif ($type === MediaLibraryItem::TYPE_FOLDER) {
+                /*
+                 * Delete single folder
+                 */
+                $library->deleteFolder($path);
+
+                $this->fireSystemEvent('media.folder.delete', [$path]);
+            }
+        }
+		
+        if (count($filesToExtract) > 0) {
+            /*
+             * Delete collection of files
+             */
+            ///$library->deleteFiles($filesToExtract);
+
+            /*
+             * Extensibility
+             */
+            foreach ($filesToExtract as $path) {
+                $library->extractFile($path);
+            }
+        }
+
+        $library->resetCache();
+        $this->prepareVars();
+		
+        return [
+            '#'.$this->getId('item-list') => $this->makePartial('item-list')
+        ];
+    }
+	
     /**
      * Show rename item popup AJAX handler
      * @return array
